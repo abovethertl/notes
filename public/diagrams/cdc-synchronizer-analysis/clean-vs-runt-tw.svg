@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 420" role="img" aria-label="Two stacked V(t) plots illustrating the two ways a synchronizer-input glitch hits MTBF. Top: a clean 1→0→1 dip with sharp full-swing edges. Each edge crosses the balance region briefly, leaving two narrow effective metastability apertures — f_data doubles compared to the no-glitch baseline, but each event has nominal T_w. Bottom: a runt — the input starts dropping but doesn't complete the transition, dwelling near V_dd/2 for hundreds of picoseconds before rising back. The single wide effective aperture combines both effects: two metastability opportunities per glitch (rise plus fall) AND each event has T_w widened by the dwell time.">
+
+  <style>
+    svg text       { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .trace         { stroke: #222939; stroke-width: 2; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+    .axis          { stroke: #60739f; stroke-width: 1; fill: none; }
+    .tick-line     { stroke: #8a93b8; stroke-width: 0.8; stroke-dasharray: 3 3; fill: none; }
+    .balance-band  { fill: #eef0f5; }
+    .balance-edge  { stroke: #8a93b8; stroke-width: 0.8; stroke-dasharray: 3 3; fill: none; }
+    .tw-column     { fill: #fef3e8; }
+    .tw-bracket    { stroke: #c84a2a; stroke-width: 1.4; fill: none; }
+    .lbl           { font-size: 11px; fill: #222939; }
+    .lbl-axis      { font-size: 10px; fill: #60739f; }
+    .lbl-panel     { font-size: 13px; fill: #222939; font-weight: 600; }
+    .lbl-panel-sub { font-size: 11px; fill: #60739f; font-style: italic; }
+    .lbl-balance   { font-size: 10px; fill: #60739f; font-style: italic; }
+    .lbl-tw        { font-size: 11px; fill: #c84a2a; font-weight: 600; }
+  </style>
+
+  <!-- =================== Panel 1: Clean 1→0→1 dip =================== -->
+  <g transform="translate(0, 0)">
+    <text class="lbl-panel"     x="20"  y="24">Clean 1→0→1 dip</text>
+    <text class="lbl-panel-sub" x="160" y="24">two clean edges — number of metastability events doubles (f<tspan font-size="9">data</tspan> effect)</text>
+
+    <!-- T_w columns (narrow, one per crossing) -->
+    <rect class="tw-column" x="277" y="50" width="6" height="130"/>
+    <rect class="tw-column" x="397" y="50" width="6" height="130"/>
+
+    <!-- Balance band (V=0.4..0.6 V_dd) -->
+    <rect class="balance-band" x="80" y="102" width="820" height="26"/>
+    <line class="balance-edge" x1="80" y1="102" x2="900" y2="102"/>
+    <line class="balance-edge" x1="80" y1="128" x2="900" y2="128"/>
+
+    <!-- Mid-rail reference line -->
+    <line class="tick-line" x1="80" y1="115" x2="900" y2="115"/>
+
+    <!-- Axis frame -->
+    <line class="axis" x1="80" y1="50"  x2="80"  y2="180"/>
+    <line class="axis" x1="80" y1="180" x2="900" y2="180"/>
+
+    <!-- Y-axis tick labels -->
+    <text class="lbl-axis" x="75" y="54"  text-anchor="end">V<tspan font-size="8">dd</tspan></text>
+    <text class="lbl-axis" x="75" y="119" text-anchor="end">V<tspan font-size="8">dd</tspan>/2</text>
+    <text class="lbl-axis" x="75" y="184" text-anchor="end">0</text>
+
+    <!-- Balance band label -->
+    <text class="lbl-balance" x="895" y="119" text-anchor="end">balance region (input unresolved)</text>
+
+    <!-- Trace: V_dd, S-fall, low, S-rise, V_dd -->
+    <path class="trace" d="M 80 50 L 250 50 C 280 50 280 180 310 180 L 370 180 C 400 180 400 50 430 50 L 900 50"/>
+
+    <!-- T_w bracket annotations -->
+    <path class="tw-bracket" d="M 277 186 L 277 190 L 283 190 L 283 186"/>
+    <path class="tw-bracket" d="M 397 186 L 397 190 L 403 190 L 403 186"/>
+    <text class="lbl-tw" x="280" y="204" text-anchor="middle">T<tspan font-size="8">w</tspan></text>
+    <text class="lbl-tw" x="400" y="204" text-anchor="middle">T<tspan font-size="8">w</tspan></text>
+    <text class="lbl-tw" x="340" y="204" text-anchor="middle">+</text>
+
+    <!-- Time axis arrow at right -->
+    <text class="lbl-axis" x="895" y="195" text-anchor="end">t →</text>
+  </g>
+
+  <!-- =================== Panel 2: Runt — incomplete dip =================== -->
+  <g transform="translate(0, 210)">
+    <text class="lbl-panel"     x="20"  y="24">Runt (incomplete dip)</text>
+    <text class="lbl-panel-sub" x="180" y="24">input dwells in balance region — events doubled AND each event has wider T<tspan font-size="9">w</tspan></text>
+
+    <!-- T_w column (covers time the input is in the balance band) -->
+    <rect class="tw-column" x="277" y="50" width="66" height="130"/>
+
+    <!-- Balance band -->
+    <rect class="balance-band" x="80" y="102" width="820" height="26"/>
+    <line class="balance-edge" x1="80" y1="102" x2="900" y2="102"/>
+    <line class="balance-edge" x1="80" y1="128" x2="900" y2="128"/>
+
+    <!-- Mid-rail reference line -->
+    <line class="tick-line" x1="80" y1="115" x2="900" y2="115"/>
+
+    <!-- Axis frame -->
+    <line class="axis" x1="80" y1="50"  x2="80"  y2="180"/>
+    <line class="axis" x1="80" y1="180" x2="900" y2="180"/>
+
+    <!-- Y-axis tick labels -->
+    <text class="lbl-axis" x="75" y="54"  text-anchor="end">V<tspan font-size="8">dd</tspan></text>
+    <text class="lbl-axis" x="75" y="119" text-anchor="end">V<tspan font-size="8">dd</tspan>/2</text>
+    <text class="lbl-axis" x="75" y="184" text-anchor="end">0</text>
+
+    <!-- Trace: V_dd, descent only as far as V_dd/2 (rise overlaps the unfinished fall), brief dwell, ascent back to V_dd. Total runt span (x=250..370 = 120 px) is shorter than Panel 1's clean two-toggle dip (180 px) but longer than a single clean transition (~60 px). What's wider is the time spent inside the balance band, not the event duration. -->
+    <path class="trace" d="M 80 50 L 250 50 C 270 50 270 115 290 115 L 330 115 C 350 115 350 50 370 50 L 900 50"/>
+
+    <!-- T_w bracket annotation: bracket spanning the time in balance -->
+    <path class="tw-bracket" d="M 277 186 L 277 190 L 343 190 L 343 186"/>
+    <text class="lbl-tw" x="310" y="204" text-anchor="middle">T<tspan font-size="8">w</tspan>  (effective) — much wider than two clean events</text>
+
+    <!-- Time axis arrow at right -->
+    <text class="lbl-axis" x="895" y="195" text-anchor="end">t →</text>
+  </g>
+</svg>

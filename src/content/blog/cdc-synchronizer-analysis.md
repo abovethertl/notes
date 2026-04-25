@@ -17,21 +17,13 @@ This note walks through four configurations of that OR, explains why one of them
 
 All four configurations are CDC rule violations: each has combinational logic or signal merging in front of the synchronizer. They differ in *what kind* of failure that violation produces, which matters for understanding the physics and for prioritizing what to fix first in shipped silicon — but it does not matter for the methodology question on new design, where the rule applies uniformly.
 
-### (a) Same clock domain, flop outputs ORed → synchronizer — **rule violation; failure mode contained under level protocol with sufficient frequency headroom**
+<img src="/diagrams/cdc-synchronizer-analysis/four-configs.svg" alt="Four configurations of the OR-before-synchronizer pattern: (a) same clock domain with flop outputs ORed, (b) same clock domain with combinational state decode, (c) different clock domains with flops ORed, (d) different clock domains with combinational decode plus OR. In every configuration the 2FF synchronizer captures into the destination clock domain; what varies is the combinational logic and clock-domain structure in front of it." />
 
-```
-req_flop[0] ─┐
-req_flop[1] ─┤─OR─► [2FF sync] ─► dst domain
-req_flop[N] ─┘
-```
+### (a) Same clock domain, flop outputs ORed → synchronizer — **rule violation; failure mode contained under level protocol with sufficient frequency headroom**
 
 All OR inputs are register outputs in the same source clock domain. The strict rule flags this as a violation — combinational logic (the OR gate) sits directly between a flop and the synchronizer. The specific failure mode the rule protects against here is a brief combinational glitch when two requesters transition in opposite directions on the same source edge with unequal path delays (e.g., req₀ 1→0 and req₁ 0→1, producing a momentary dip on the OR output). Under a level protocol with hold-high across multiple destination cycles, a single dropped sample is recovered on the next destination edge, and at low destination frequencies the MTBF exponent cushion absorbs the runt-induced denominator degradation (see Parts 2 and 4). This is why (a) configurations have historically shipped at 100-MHz-class destinations without visible field failures. It does not make the violation correct. Part 5 addresses why the rule holds for new design anyway, and why the cushion evaporates at modern frequencies.
 
 ### (b) Same clock domain, state-machine decode → synchronizer — **rule violation; silent phantom requests**
-
-```
-state_reg ─► [comb decode: (state == XYZ)] ─► [2FF sync]
-```
 
 The decode is combinational logic on multiple state bits. Path-delay skew between those bits causes the decode to glitch through intermediate encodings during state transitions (binary `011 → 100` can momentarily look like `001`, `101`, `111`). Any transient that matches `XYZ` produces a spurious 1 on `request` — **including when the state machine never actually reaches `XYZ`**.
 
@@ -70,11 +62,13 @@ This is (b) and (c) stacked. The phantom-request failure mode from (b) is presen
 
 ---
 
-## Part 2 — Why the combinational glitch in (a) is absorbed under a level protocol
+## Part 2 — Why the OR-of-flops glitch has historically been invisible at low destination frequencies
 
-*A note on framing: this section explains the physics of why the (a) glitch does not reach the destination as a corrupted value, given specific conditions. It is not an argument that (a) is a methodologically acceptable design. The strict CDC rule flags (a) as a violation and is correct to do so; Part 5 addresses why the rule holds for new design even though the physics of an individual (a) case can be defended.*
+*A note on framing: this section explains why the OR-of-flops glitch — present in both configurations (a) and (c) — has not historically produced visible field failures at low destination frequencies. It is not an argument that those configurations are methodologically acceptable. The strict CDC rule flags both as violations and is correct to do so; Part 5 addresses why the rule holds for new design even though the physics of individual OR-of-flops cases can be defended.*
 
-The glitch in question: on a source edge, req_i goes 1→0 while req_j goes 0→1 with unequal path delays, producing a brief 1→0→1 transient on the OR output.
+The glitch in question: on a source edge in configuration (a), req_i goes 1→0 while req_j goes 0→1 with unequal path delays, producing a brief 1→0→1 transient on the OR output. Configuration (c) produces the same kind of brief transient through a different mechanism — a handoff runt when one requester's high ends just before another's begins on uncorrelated source clocks — and the absorption argument that follows applies identically once the dip exists.
+
+<img src="/diagrams/cdc-synchronizer-analysis/runt-formation-sampling.svg" alt="Stacked digital waveforms. At the source edge, req_flop[0] falls from 1 to 0, and req_flop[1] rises from 0 to 1 with a small skew Δt. The OR output holds 1 before the edge, briefly dips to 0 during the skew window — the runt pulse — and returns to 1. The destination clock, shown below, toggles at a fixed period; its two rising edges on either side of the runt sample a clean 1. A footer note explains that only the rare coincidence of a destination edge landing inside Δt can produce a missed or metastable sample." />
 
 "Safe" rests on three conditions:
 
@@ -148,6 +142,8 @@ Leaving resolution-time questions aside, the linear-denominator degradation is p
 - **T_w widens.** The effective metastability aperture for a runt input is the portion of the runt's duration where the input sits near the balance threshold — which is most of the runt. For MTBF accounting this acts as a much wider aperture than a clean edge crossing.
 - **f_data rises.** A runt is a rise *and* a fall. Each is a metastability opportunity.
 
+<img src="/diagrams/cdc-synchronizer-analysis/clean-vs-runt-tw.svg" alt="Two stacked V(t) plots showing the two distinct ways a glitch on the synchronizer input hits MTBF. Top: a clean 1→0→1 dip with sharp full-swing edges. Each edge crosses the balance region briefly, leaving two narrow effective metastability apertures — f_data doubles relative to a no-glitch baseline, but each event has nominal T_w. Bottom: a runt — the input starts dropping but doesn't complete the transition, dwelling near V_dd/2 for hundreds of picoseconds before rising back. The single wide effective aperture stacks both effects: two metastability opportunities per glitch (rise plus fall) AND each event has T_w widened by the dwell." />
+
 Both are linear penalties in the MTBF denominator. They compound with the uncertain effective-resolution-time effect from (3) to push MTBF below the clean-input prediction by an amount that is bounded below by these linear factors and upper-bounded by simulation results nobody runs on waived blocks.
 
 ### Why the level protocol still recovers — even when metastability happens
@@ -171,11 +167,13 @@ These structural properties are what let legacy designs at low frequencies survi
 
 Standard 2FF synchronizer MTBF:
 
-```
-           exp(T_r / τ)
-MTBF = ─────────────────────
-        f_clk · f_data · T_w
-```
+<div class="eq">
+  <span>MTBF =</span>
+  <span class="eq-frac">
+    <span class="eq-num">e<sup><var>T</var><sub>r</sub> / <var>τ</var></sup></span>
+    <span class="eq-den"><var>f</var><sub>clk</sub> · <var>f</var><sub>data</sub> · <var>T</var><sub>w</sub></span>
+  </span>
+</div>
 
 - `T_dst` — destination clock period (1 / f_clk)
 - `T_setup2` — setup time of the second flop in the 2FF synchronizer

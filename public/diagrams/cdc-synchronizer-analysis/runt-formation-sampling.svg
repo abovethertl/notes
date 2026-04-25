@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 360" role="img" aria-label="Four stacked digital waveforms over time. On the source clock edge, req_flop[0] falls from 1 to 0 and req_flop[1] rises from 0 to 1 a short skew later. The OR of the two briefly dips to 0 between the fall and the rise — the runt pulse, with width equal to the inter-flop skew. Below, the destination clock toggles at a fixed period; its rising edges sample the OR output. In this trace the runt falls between two destination rising edges, so both adjacent samples capture a clean 1. A label marks the rare case in which a destination edge lands inside the runt.">
+
+  <defs>
+    <marker id="arrow-runt" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#c84a2a"/>
+    </marker>
+    <marker id="arrow-sample" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M10,0 L0,5 L10,10 z" fill="#2337ff"/>
+    </marker>
+  </defs>
+
+  <style>
+    svg text       { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .trace         { stroke: #222939; stroke-width: 1.8; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+    .trace-clk     { stroke: #2337ff; stroke-width: 1.8; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+    .runt-segment  { stroke: #c84a2a; stroke-width: 2.2; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+    .edge-marker   { stroke: #8a93b8; stroke-width: 0.8; stroke-dasharray: 3 3; fill: none; }
+    .sample-marker { stroke: #2337ff; stroke-width: 1; stroke-dasharray: 2 2; fill: none; }
+    .bracket       { stroke: #c84a2a; stroke-width: 1.2; fill: none; }
+    .lbl-lane      { font-size: 11px; fill: #222939; }
+    .lbl-axis      { font-size: 10px; fill: #60739f; }
+    .lbl-title     { font-size: 13px; fill: #222939; font-weight: 600; }
+    .lbl-title-sub { font-size: 11px; fill: #60739f; font-style: italic; }
+    .lbl-runt      { font-size: 11px; fill: #c84a2a; font-weight: 600; }
+    .lbl-sample    { font-size: 10px; fill: #2337ff; font-weight: 600; }
+    .lbl-note      { font-size: 11px; fill: #60739f; font-style: italic; }
+  </style>
+
+  <!-- Title -->
+  <text class="lbl-title"     x="20"  y="22">Runt formation and destination sampling</text>
+  <text class="lbl-title-sub" x="305" y="22">configuration (a), single source edge</text>
+
+  <!-- Source edge vertical marker (spans all four lanes) -->
+  <line class="edge-marker" x1="563" y1="48" x2="563" y2="312"/>
+  <text class="lbl-axis" x="563" y="42" text-anchor="middle">source edge</text>
+
+  <!-- ============ Lane 1: req_flop[0] ============ -->
+  <text class="lbl-lane" x="75" y="79" text-anchor="end">req_flop[0]</text>
+  <path class="trace" d="M 80 60 L 559 60 L 567 90 L 920 90"/>
+  <text class="lbl-axis" x="300" y="55"  text-anchor="middle">1</text>
+  <text class="lbl-axis" x="740" y="103" text-anchor="middle">0</text>
+
+  <!-- ============ Lane 2: req_flop[1] ============ -->
+  <text class="lbl-lane" x="75" y="139" text-anchor="end">req_flop[1]</text>
+  <path class="trace" d="M 80 150 L 580 150 L 588 120 L 920 120"/>
+  <text class="lbl-axis" x="300" y="163" text-anchor="middle">0</text>
+  <text class="lbl-axis" x="740" y="115" text-anchor="middle">1</text>
+
+  <!-- Skew annotation between source edge and req[1] rise -->
+  <line class="bracket" x1="563" y1="172" x2="584" y2="172"/>
+  <line class="bracket" x1="563" y1="168" x2="563" y2="176"/>
+  <line class="bracket" x1="584" y1="168" x2="584" y2="176"/>
+  <text class="lbl-runt" x="595" y="176">Δt (path-delay skew)</text>
+
+  <!-- ============ Lane 3: OR output — runt visible ============ -->
+  <text class="lbl-lane" x="75" y="209" text-anchor="end">OR output</text>
+  <!-- steady 1 before runt -->
+  <path class="trace" d="M 80 190 L 559 190"/>
+  <!-- runt: trapezoidal dip with sloped fall, low plateau, sloped rise -->
+  <path class="runt-segment" d="M 559 190 L 567 220 L 580 220 L 588 190"/>
+  <!-- steady 1 after runt -->
+  <path class="trace" d="M 588 190 L 920 190"/>
+  <text class="lbl-axis" x="300" y="185" text-anchor="middle">1</text>
+  <text class="lbl-axis" x="740" y="185" text-anchor="middle">1</text>
+
+  <!-- Runt callout with arrow pointing to the dip -->
+  <path class="runt-segment" stroke-width="1.2" marker-end="url(#arrow-runt)" d="M 640 245 Q 610 238 578 225"/>
+  <text class="lbl-runt" x="645" y="249">runt pulse (width = Δt)</text>
+
+  <!-- ============ Lane 4: dst_clk ============ -->
+  <text class="lbl-lane" x="75" y="280" text-anchor="end">dst_clk</text>
+  <!-- dst_clk: rising edges at t = 0, 1, 2, 3, 4 ns   =>   x = 80, 290, 500, 710, 920. period 1 ns, 50% duty. Slanted edges, ~6 px wide. -->
+  <path class="trace-clk" d="M 77 300 L 83 260 L 182 260 L 188 300 L 287 300 L 293 260 L 392 260 L 398 300 L 497 300 L 503 260 L 602 260 L 608 300 L 707 300 L 713 260 L 812 260 L 818 300 L 920 300"/>
+
+  <!-- Rising-edge sample markers at x=500 (t=2 ns) and x=710 (t=3 ns) — the two edges bracketing the runt -->
+  <line class="sample-marker" x1="500" y1="190" x2="500" y2="260"/>
+  <line class="sample-marker" x1="710" y1="190" x2="710" y2="260"/>
+
+  <!-- Sample ticks + labels: upward arrows from dst_clk rising edges up to OR lane at the sample point -->
+  <path class="trace-clk" stroke-width="1.3" marker-end="url(#arrow-sample)" d="M 500 260 L 500 196"/>
+  <path class="trace-clk" stroke-width="1.3" marker-end="url(#arrow-sample)" d="M 710 260 L 710 196"/>
+  <text class="lbl-sample" x="500" y="215" text-anchor="middle">samples 1</text>
+  <text class="lbl-sample" x="710" y="215" text-anchor="middle">samples 1</text>
+
+  <!-- Time axis -->
+  <text class="lbl-axis" x="920" y="325" text-anchor="end">t →</text>
+
+  <!-- Footer note: rare case -->
+  <text class="lbl-note" x="480" y="350" text-anchor="middle">
+    Typical case shown: the runt falls between destination edges. In rare cases a dst_clk edge lands inside Δt — then the first sync flop can resolve to 0 (missed this cycle, recovered next) or briefly go metastable.
+  </text>
+</svg>

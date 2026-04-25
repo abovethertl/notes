@@ -1,0 +1,238 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 560" role="img" aria-label="Four configurations of multiple requesters through a single-bit synchronizer. Panel a: two flops in the same source clock domain feed an OR gate that drives a 2FF synchronizer. Panel b: a state register in the source clock domain feeds a combinational decode, which enters one input of an OR gate whose other inputs are not shown, and the OR output drives the 2FF synchronizer. Panel c: two flops in separate source clock domains feed an OR gate that drives the 2FF synchronizer. Panel d: two source domains each with a state register and combinational decode are ORed together before the 2FF synchronizer.">
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+      <path d="M0,0 L10,5 L0,10 z" fill="#222939"/>
+    </marker>
+  </defs>
+
+  <style>
+    svg text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+    .wire      { stroke: #222939; stroke-width: 1.5; fill: none; }
+    .box       { stroke: #222939; stroke-width: 1.5; fill: #ffffff; }
+    .sync-box  { stroke: #2337ff; stroke-width: 2;   fill: #f4f5ff; }
+    .inner-ff  { stroke: #8a93b8; stroke-width: 1;   fill: #ffffff; }
+    .domain-a  { fill: #eef0f5; stroke: none; }
+    .domain-b  { fill: #ede9f5; stroke: none; }
+    .lbl           { font-size: 11px; fill: #222939; }
+    .lbl-op        { font-size: 13px; fill: #222939; font-weight: 600; }
+    .lbl-sync      { font-size: 11px; fill: #2337ff; font-weight: 600; letter-spacing: 0.2px; }
+    .lbl-panel     { font-size: 13px; fill: #222939; font-weight: 600; }
+    .lbl-panel-sub { font-size: 11px; fill: #60739f; font-style: italic; }
+    .lbl-clk       { font-size: 10px; fill: #60739f; font-style: italic; }
+    .lbl-small     { font-size:  9px; fill: #60739f; }
+  </style>
+
+  <!-- ============ Panel (a) — same clock, flops ORed ============ -->
+  <g transform="translate(0, 0)">
+    <text class="lbl-panel"     x="10" y="22">(a)</text>
+    <text class="lbl-panel-sub" x="32" y="22">same src_clk · flops → OR → 2FF</text>
+
+    <rect class="domain-a" x="10" y="40" width="200" height="220" rx="4"/>
+    <text class="lbl-clk" x="110" y="58" text-anchor="middle">src_clk domain</text>
+
+    <!-- req_flop[0] -->
+    <g transform="translate(50, 90)">
+      <rect class="box" x="0" y="0" width="70" height="40"/>
+      <text class="lbl" x="35" y="-6" text-anchor="middle">req_flop[0]</text>
+      <polyline points="3,37 10,33 3,29" fill="none" stroke="#222939" stroke-width="1.2"/>
+    </g>
+
+    <!-- req_flop[1] -->
+    <g transform="translate(50, 180)">
+      <rect class="box" x="0" y="0" width="70" height="40"/>
+      <text class="lbl" x="35" y="-6" text-anchor="middle">req_flop[1]</text>
+      <polyline points="3,37 10,33 3,29" fill="none" stroke="#222939" stroke-width="1.2"/>
+    </g>
+
+    <!-- wires: flops -> OR inputs -->
+    <path class="wire" d="M 120 110 L 180 110 L 180 125 L 230 125"/>
+    <path class="wire" d="M 120 200 L 180 200 L 180 155 L 230 155"/>
+
+    <!-- OR gate (ANSI / distinctive shape) -->
+    <path class="box" d="M 230,110 Q 245,140 230,170 Q 272,170 290,140 Q 272,110 230,110 z"/>
+
+    <!-- OR -> 2FF -->
+    <path class="wire" d="M 290 140 L 340 140"/>
+
+    <!-- 2FF synchronizer -->
+    <rect class="sync-box" x="340" y="110" width="110" height="60" rx="3"/>
+    <text class="lbl-sync" x="395" y="102" text-anchor="middle">2FF sync</text>
+    <rect class="inner-ff" x="350" y="125" width="40" height="30"/>
+    <polyline points="353,152 359,148 353,144" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <rect class="inner-ff" x="400" y="125" width="40" height="30"/>
+    <polyline points="403,152 409,148 403,144" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <line x1="390" y1="140" x2="400" y2="140" stroke="#8a93b8" stroke-width="1"/>
+
+    <!-- output -->
+    <path class="wire" d="M 450 140 L 470 140" marker-end="url(#arrow)"/>
+    <text class="lbl" x="475" y="144">dst</text>
+
+    <text class="lbl-clk" x="395" y="188" text-anchor="middle">dst_clk</text>
+  </g>
+
+  <!-- ============ Panel (b) — same clock, state decode ============ -->
+  <g transform="translate(480, 0)">
+    <text class="lbl-panel"     x="10" y="22">(b)</text>
+    <text class="lbl-panel-sub" x="32" y="22">same src_clk · state decode → OR → 2FF</text>
+
+    <rect class="domain-a" x="10" y="40" width="205" height="220" rx="4"/>
+    <text class="lbl-clk" x="112" y="58" text-anchor="middle">src_clk domain</text>
+
+    <!-- state_reg -->
+    <g transform="translate(25, 115)">
+      <rect class="box" x="0" y="0" width="65" height="40"/>
+      <text class="lbl" x="32" y="-6" text-anchor="middle">state_reg</text>
+      <polyline points="3,37 10,33 3,29" fill="none" stroke="#222939" stroke-width="1.2"/>
+    </g>
+
+    <!-- bus: state_reg -> decode, with width tick -->
+    <path class="wire" d="M 90 135 L 115 135"/>
+    <line x1="100" y1="129" x2="108" y2="141" stroke="#222939" stroke-width="1"/>
+    <text class="lbl-small" x="104" y="126" text-anchor="middle">n</text>
+
+    <!-- combinational decode -->
+    <rect class="box" x="115" y="115" width="85" height="40"/>
+    <text class="lbl-op" x="157" y="140" text-anchor="middle">= XYZ</text>
+
+    <!-- decode -> OR upper input (straight) -->
+    <path class="wire" d="M 200 135 L 220 135"/>
+
+    <!-- OR gate (ANSI) -->
+    <path class="box" d="M 220,120 Q 235,150 220,180 Q 262,180 280,150 Q 262,120 220,120 z"/>
+
+    <!-- stub for other (not-shown) OR inputs -->
+    <path class="wire" d="M 188 165 L 220 165"/>
+    <text class="lbl" x="183" y="170" text-anchor="end" font-size="15">…</text>
+
+    <!-- OR -> 2FF -->
+    <path class="wire" d="M 280 150 L 300 150"/>
+
+    <!-- 2FF synchronizer -->
+    <rect class="sync-box" x="300" y="120" width="110" height="60" rx="3"/>
+    <text class="lbl-sync" x="355" y="112" text-anchor="middle">2FF sync</text>
+    <rect class="inner-ff" x="310" y="135" width="40" height="30"/>
+    <polyline points="313,162 319,158 313,154" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <rect class="inner-ff" x="360" y="135" width="40" height="30"/>
+    <polyline points="363,162 369,158 363,154" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <line x1="350" y1="150" x2="360" y2="150" stroke="#8a93b8" stroke-width="1"/>
+
+    <!-- output -->
+    <path class="wire" d="M 410 150 L 430 150" marker-end="url(#arrow)"/>
+    <text class="lbl" x="435" y="154">dst</text>
+
+    <text class="lbl-clk" x="355" y="198" text-anchor="middle">dst_clk</text>
+  </g>
+
+  <!-- ============ Panel (c) — different clocks, flops ORed ============ -->
+  <g transform="translate(0, 280)">
+    <text class="lbl-panel"     x="10" y="22">(c)</text>
+    <text class="lbl-panel-sub" x="32" y="22">different clocks · flops → OR → 2FF</text>
+
+    <rect class="domain-a" x="10" y="40"  width="200" height="100" rx="4"/>
+    <text class="lbl-clk" x="110" y="58" text-anchor="middle">src_clk_A domain</text>
+
+    <rect class="domain-b" x="10" y="150" width="200" height="100" rx="4"/>
+    <text class="lbl-clk" x="110" y="168" text-anchor="middle">src_clk_B domain</text>
+
+    <!-- req_A -->
+    <g transform="translate(50, 85)">
+      <rect class="box" x="0" y="0" width="70" height="40"/>
+      <text class="lbl" x="35" y="-6" text-anchor="middle">req_A</text>
+      <polyline points="3,37 10,33 3,29" fill="none" stroke="#222939" stroke-width="1.2"/>
+    </g>
+
+    <!-- req_B -->
+    <g transform="translate(50, 195)">
+      <rect class="box" x="0" y="0" width="70" height="40"/>
+      <text class="lbl" x="35" y="-6" text-anchor="middle">req_B</text>
+      <polyline points="3,37 10,33 3,29" fill="none" stroke="#222939" stroke-width="1.2"/>
+    </g>
+
+    <!-- wires: flops -> OR inputs -->
+    <path class="wire" d="M 120 105 L 180 105 L 180 125 L 230 125"/>
+    <path class="wire" d="M 120 215 L 180 215 L 180 155 L 230 155"/>
+
+    <!-- OR gate (ANSI) -->
+    <path class="box" d="M 230,110 Q 245,140 230,170 Q 272,170 290,140 Q 272,110 230,110 z"/>
+
+    <!-- OR -> 2FF -->
+    <path class="wire" d="M 290 140 L 340 140"/>
+
+    <!-- 2FF synchronizer -->
+    <rect class="sync-box" x="340" y="110" width="110" height="60" rx="3"/>
+    <text class="lbl-sync" x="395" y="102" text-anchor="middle">2FF sync</text>
+    <rect class="inner-ff" x="350" y="125" width="40" height="30"/>
+    <polyline points="353,152 359,148 353,144" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <rect class="inner-ff" x="400" y="125" width="40" height="30"/>
+    <polyline points="403,152 409,148 403,144" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <line x1="390" y1="140" x2="400" y2="140" stroke="#8a93b8" stroke-width="1"/>
+
+    <!-- output -->
+    <path class="wire" d="M 450 140 L 470 140" marker-end="url(#arrow)"/>
+    <text class="lbl" x="475" y="144">dst</text>
+
+    <text class="lbl-clk" x="395" y="188" text-anchor="middle">dst_clk</text>
+  </g>
+
+  <!-- ============ Panel (d) — different clocks, decode + OR ============ -->
+  <g transform="translate(480, 280)">
+    <text class="lbl-panel"     x="10" y="22">(d)</text>
+    <text class="lbl-panel-sub" x="32" y="22">different clocks · decode + OR → 2FF</text>
+
+    <rect class="domain-a" x="10" y="40"  width="230" height="100" rx="4"/>
+    <text class="lbl-clk" x="125" y="58" text-anchor="middle">src_clk_A domain</text>
+
+    <rect class="domain-b" x="10" y="150" width="230" height="100" rx="4"/>
+    <text class="lbl-clk" x="125" y="168" text-anchor="middle">src_clk_B domain</text>
+
+    <!-- state_A -->
+    <g transform="translate(25, 85)">
+      <rect class="box" x="0" y="0" width="60" height="40"/>
+      <text class="lbl" x="30" y="-6" text-anchor="middle">state_A</text>
+      <polyline points="3,37 10,33 3,29" fill="none" stroke="#222939" stroke-width="1.2"/>
+    </g>
+    <path class="wire" d="M 85 105 L 125 105"/>
+    <line x1="100" y1="99" x2="108" y2="111" stroke="#222939" stroke-width="1"/>
+    <text class="lbl-small" x="104" y="96" text-anchor="middle">n</text>
+    <rect class="box" x="125" y="85" width="100" height="40"/>
+    <text class="lbl-op" x="175" y="110" text-anchor="middle">= XYZ_A</text>
+
+    <!-- state_B -->
+    <g transform="translate(25, 195)">
+      <rect class="box" x="0" y="0" width="60" height="40"/>
+      <text class="lbl" x="30" y="-6" text-anchor="middle">state_B</text>
+      <polyline points="3,37 10,33 3,29" fill="none" stroke="#222939" stroke-width="1.2"/>
+    </g>
+    <path class="wire" d="M 85 215 L 125 215"/>
+    <line x1="100" y1="209" x2="108" y2="221" stroke="#222939" stroke-width="1"/>
+    <text class="lbl-small" x="104" y="206" text-anchor="middle">n</text>
+    <rect class="box" x="125" y="195" width="100" height="40"/>
+    <text class="lbl-op" x="175" y="220" text-anchor="middle">= XYZ_B</text>
+
+    <!-- decode outputs -> OR inputs -->
+    <path class="wire" d="M 225 105 L 235 105 L 235 135 L 245 135"/>
+    <path class="wire" d="M 225 215 L 235 215 L 235 165 L 245 165"/>
+
+    <!-- OR gate (ANSI) -->
+    <path class="box" d="M 245,120 Q 260,150 245,180 Q 287,180 305,150 Q 287,120 245,120 z"/>
+
+    <!-- OR -> 2FF -->
+    <path class="wire" d="M 305 150 L 340 150"/>
+
+    <!-- 2FF synchronizer -->
+    <rect class="sync-box" x="340" y="120" width="110" height="60" rx="3"/>
+    <text class="lbl-sync" x="395" y="112" text-anchor="middle">2FF sync</text>
+    <rect class="inner-ff" x="350" y="135" width="40" height="30"/>
+    <polyline points="353,162 359,158 353,154" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <rect class="inner-ff" x="400" y="135" width="40" height="30"/>
+    <polyline points="403,162 409,158 403,154" fill="none" stroke="#8a93b8" stroke-width="1"/>
+    <line x1="390" y1="150" x2="400" y2="150" stroke="#8a93b8" stroke-width="1"/>
+
+    <!-- output -->
+    <path class="wire" d="M 450 150 L 470 150" marker-end="url(#arrow)"/>
+    <text class="lbl" x="475" y="154">dst</text>
+
+    <text class="lbl-clk" x="395" y="198" text-anchor="middle">dst_clk</text>
+  </g>
+</svg>
